@@ -5,6 +5,8 @@
 
 #include <stdexcept>
 #include <vector>
+#include <set>
+#include <algorithm>
 
 #include "Utilities.h"
 
@@ -21,6 +23,7 @@ private:
 	GLFWwindow* window;
 
 	// Vulkan Components
+	// - Main
 	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
 
@@ -30,16 +33,40 @@ private:
 	} mainDevice;
 
 	VkQueue graphicsQueue;
+	VkQueue presentationQueue;
+	VkSurfaceKHR surface;
+	VkSwapchainKHR swapchain;
+	std::vector<SwapchainImage> swapchainImages;
+
+	// - Utility
+	VkFormat swapchainImageFormat;
+	VkExtent2D swapchainExtent;
 
 	// Vulkan Functions
 	void createInstance();
 	void createLogicalDevice();
+	void createSurface();
+	void createSwapchain();
 
+	// Support Functions
+	// -- Checker
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	bool checkDeviceSuitable(VkPhysicalDevice device);
 
+	// -- Getters
 	void getPhysicalDevice();
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+	SwapchainDetails getSwapChainDetails(VkPhysicalDevice device);
+
+	// -- Choose
+	VkSurfaceFormatKHR chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats);
+	VkPresentModeKHR chooseBestPresentationMode(const std::vector<VkPresentModeKHR>& presentationModes);
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
+
+	// -- Create
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+
 
 	// Validation Layers
 	const std::vector<const char*> validationLayers = {
